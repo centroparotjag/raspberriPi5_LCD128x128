@@ -49,25 +49,25 @@ void init_LC7981(uint8_t mode) {
 	delay(1); // ms
 
 	if (mode == LCD_TEXT) {					// LCD_TEXT
-		lcd_write_instriction(0x00, 0x3C);
-		lcd_write_instriction(0x01, 0x75);
-		lcd_write_instriction(0x02, LCD_TEXT_COLUMNS - 1);
-		lcd_write_instriction(0x03, 0x4F);
-		lcd_write_instriction(0x04, 0x07);
-		lcd_write_instriction(0x08, 0x00);
-		lcd_write_instriction(0x09, 0x00);
-		lcd_write_instriction(0x0A, 0x00);
-		lcd_write_instriction(0x0B, 0x00);
+		lcd_write_instriction(0x00, 0x3C);	// Mode control
+		lcd_write_instriction(0x01, 0x75);	// setting the character pitch
+		lcd_write_instriction(0x02, LCD_TEXT_COLUMNS - 1);	// number of character
+		lcd_write_instriction(0x03, 0x20);	// time devision number 0x4F
+		lcd_write_instriction(0x04, 0x07);	// cursor position
+		lcd_write_instriction(0x08, 0x00);	// display start lower address
+		lcd_write_instriction(0x09, 0x00);	// display start upper address
+		lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
+		lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
 	}
-	else {								// LCD_GRAPHIC
-		lcd_write_instriction(0x00, 0x32);
-		lcd_write_instriction(0x01, 0x07);
-		lcd_write_instriction(0x02, (LCD_GRAPHIC_WIDTH / 8) - 1);
-		lcd_write_instriction(0x03, 0x4F);
-		lcd_write_instriction(0x08, 0x00);
-		lcd_write_instriction(0x09, 0x00);
-		lcd_write_instriction(0x0A, 0x00);
-		lcd_write_instriction(0x0B, 0x00);
+	else {									// LCD_GRAPHIC
+		lcd_write_instriction(0x00, 0x32);	// Mode control
+		lcd_write_instriction(0x01, 0x07);	// setting the character pitch
+		lcd_write_instriction(0x02, (LCD_GRAPHIC_WIDTH / 8) - 1);	// number of character
+		lcd_write_instriction(0x03, 0x30);	// time devision number 0x4F
+		lcd_write_instriction(0x08, 0x00);	// display start lower address
+		lcd_write_instriction(0x09, 0x00);	// display start upper address
+		lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
+		lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
 	}
 	lcd_clear();
 }
@@ -79,23 +79,22 @@ void init_LC7981(uint8_t mode) {
 void lcd_clear() {
 	uint16_t i;
 	if (lcd_mode == LCD_TEXT) {
-		lcd_write_instriction(0x0A, 0x00);
-		lcd_write_instriction(0x0B, 0x00);
-		//for (i = 1; i <= LCD_TEXT_LINES * LCD_TEXT_COLUMNS; i++) {
-		for (i = 1; i <= 14; i++) {
-			lcd_write_instriction(0x0C, 'c');
+		lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
+		lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
+		for (i = 1; i <= LCD_TEXT_LINES * LCD_TEXT_COLUMNS; i++) {
+			lcd_write_instriction(0x0C, 'c');	// writing display data
 		}
-		lcd_write_instriction(0x0A, 0x00);
-		lcd_write_instriction(0x0B, 0x00);
+		lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
+		lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
 		lcd_curline = 0;
 	}
 	else {
-		lcd_write_instriction(0x0A, 0x00);
-		lcd_write_instriction(0x0B, 0x00);
+		lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
+		lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
 		for (i = 0; i < ((LCD_GRAPHIC_WIDTH * LCD_GRAPHIC_HEIGHT) / 8); i++) {
-			lcd_write_instriction(0x0C, 0x81);				//(uint8_t)i & 0xff
+			lcd_write_instriction(0x0C, 0x81);	// writing display data				//(uint8_t)i & 0xff
 		}
-		lcd_write_instriction(0x0A, 0x00);
-		lcd_write_instriction(0x0B, 0x00);
+		lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
+		lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
 	}
 }

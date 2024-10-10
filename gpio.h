@@ -13,10 +13,10 @@
 	#define	DB6	8
 	#define	DB7	7
 
-	#define	RS  12
-	#define	E   16
+	#define	RS	12
+	#define	E	16
 	#define	CS	20
-	#define	RES 21
+	#define	RES	21
 	//-------------------
 
 int gpio_init(void);

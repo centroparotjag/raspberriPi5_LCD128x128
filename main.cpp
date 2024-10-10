@@ -12,7 +12,7 @@ int main(void)
 	wiringPiSetupSys();
 	gpio_init();
 
-	init_LC7981(0);
+	init_LC7981(1);
 
 	printf("END INIT LCD128x128\n");
 
