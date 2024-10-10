@@ -3,12 +3,14 @@
 #include <stdint.h>
 #include "LC7981.h"
 #include "gpio.h"
+#include <string.h>
 
 void E_wr(void) {
 	digitalWrite(E, 1);
 	delayMicroseconds(1);
 	digitalWrite(E, 0);
 	delayMicroseconds(1);
+	//delay(10);
 }
 
 void wr_port_DB8b_LCD(uint8_t DATA) {
@@ -49,11 +51,11 @@ void init_LC7981(uint8_t mode) {
 	delay(1); // ms
 
 	if (mode == LCD_TEXT) {					// LCD_TEXT
-		lcd_write_instriction(0x00, 0x3C);	// Mode control
-		lcd_write_instriction(0x01, 0x75);	// setting the character pitch
+		lcd_write_instriction(0x00, 0x30);	// Mode control
+		lcd_write_instriction(0x01, 0x86);	// setting the character pitch 75
 		lcd_write_instriction(0x02, LCD_TEXT_COLUMNS - 1);	// number of character
-		lcd_write_instriction(0x03, 0x20);	// time devision number 0x4F
-		lcd_write_instriction(0x04, 0x07);	// cursor position
+		lcd_write_instriction(0x03, 0x7F);	// time devision number 0x4F
+		lcd_write_instriction(0x04, 0x00);	// cursor position
 		lcd_write_instriction(0x08, 0x00);	// display start lower address
 		lcd_write_instriction(0x09, 0x00);	// display start upper address
 		lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
@@ -63,7 +65,8 @@ void init_LC7981(uint8_t mode) {
 		lcd_write_instriction(0x00, 0x32);	// Mode control
 		lcd_write_instriction(0x01, 0x07);	// setting the character pitch
 		lcd_write_instriction(0x02, (LCD_GRAPHIC_WIDTH / 8) - 1);	// number of character
-		lcd_write_instriction(0x03, 0x30);	// time devision number 0x4F
+		lcd_write_instriction(0x03, 0x7f);	// time devision number 0x4F
+		lcd_write_instriction(0x04, 0x00);	// cursor position
 		lcd_write_instriction(0x08, 0x00);	// display start lower address
 		lcd_write_instriction(0x09, 0x00);	// display start upper address
 		lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
@@ -82,7 +85,7 @@ void lcd_clear() {
 		lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
 		lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
 		for (i = 1; i <= LCD_TEXT_LINES * LCD_TEXT_COLUMNS; i++) {
-			lcd_write_instriction(0x0C, 'c');	// writing display data
+			lcd_write_instriction(0x0C, ' ');	// writing display data
 		}
 		lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
 		lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
@@ -92,9 +95,54 @@ void lcd_clear() {
 		lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
 		lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
 		for (i = 0; i < ((LCD_GRAPHIC_WIDTH * LCD_GRAPHIC_HEIGHT) / 8); i++) {
-			lcd_write_instriction(0x0C, 0x81);	// writing display data				//(uint8_t)i & 0xff
+			lcd_write_instriction(0x0C, 0x00);	// writing display data	
 		}
 		lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
 		lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
 	}
+}
+
+//row - рядок, column -стовбчик,   
+void wr_letter(uint8_t row, uint8_t column, uint8_t letter ) {
+	uint16_t LCD_Address = row * 32 + column;
+	lcd_write_instriction(0x0A, LCD_Address & 0x00FF);	// cursor start lower address
+	lcd_write_instriction(0x0B, LCD_Address >> 8);	    // cursor start upper address
+	lcd_write_instriction(0x0C, letter);	// writing display data
+}
+
+void wr_text_in_character_mode(uint8_t row, uint8_t column, char* str) {
+	uint8_t i = 0;
+
+	while (str[i] != 0 && i < 18) {
+		wr_letter(row, column+i, str[i]);
+		i++;
+	}
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////// TEST FOO //////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <stdio.h>
+
+void wr_letters(void) {
+	uint8_t n = 0;
+	for (uint8_t t = 0; t < 6; t++)
+	{
+		for (uint8_t i = 0; i < 18; i++)
+		{
+			wr_letter(t, i, n + 0x21);
+			n++;
+		}
+	}
+
+	wr_text_in_character_mode(7, 3, "Test");
+	wr_text_in_character_mode(8, 3, "compile time");
+	wr_text_in_character_mode(9, 3, __DATE__);
+	wr_text_in_character_mode(10,3, __TIME__);
+
+	wr_text_in_character_mode(12, 3, "Hello Oleg :)");
 }

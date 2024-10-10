@@ -2,8 +2,8 @@
 #define LC7981_H_
 
 #define LCD_TEXT 0				    //!< Constant for text mode
-#define LCD_TEXT_LINES   14 		//!< Number of lines in text mode
-#define LCD_TEXT_COLUMNS 16         //!< Number of columns in text mode
+#define LCD_TEXT_LINES   16		//!< Number of lines in text mode
+#define LCD_TEXT_COLUMNS 32      //!< Number of columns in text mode 24 32
 
 #define LCD_GRAPHIC 1				//!< Constant for graphic mode
 #define LCD_GRAPHIC_WIDTH  128		//!< Horizontal display size in pixels
@@ -16,5 +16,10 @@ void wr_port_DB8b_LCD(uint8_t DATA);
 void lcd_write_instriction(uint8_t instruction, uint8_t data);
 void E_wr(void);
 void lcd_clear();
+void test_write_LCD(uint8_t lower_address, uint8_t upper_address, uint8_t letter);
+void wr_letters(void);
+void wr_letter(uint8_t row, uint8_t column, uint8_t letter);
+void wr_text_in_character_mode(uint8_t row, uint8_t column, char* str);
+
 
 #endif // !LC7981_H_#pragma once
