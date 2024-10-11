@@ -4,6 +4,7 @@
 #include "LC7981.h"
 #include "gpio.h"
 #include <string.h>
+#include "img_data.h"
 
 void E_wr(void) {
 	digitalWrite(E, 1);
@@ -65,7 +66,7 @@ void init_LC7981(uint8_t mode) {
 		lcd_write_instriction(0x00, 0x32);	// Mode control
 		lcd_write_instriction(0x01, 0x07);	// setting the character pitch
 		lcd_write_instriction(0x02, (LCD_GRAPHIC_WIDTH / 8) - 1);	// number of character
-		lcd_write_instriction(0x03, 0x7f);	// time devision number 0x4F
+		lcd_write_instriction(0x03, 0x7F);	// time devision number 0x4F
 		lcd_write_instriction(0x04, 0x00);	// cursor position
 		lcd_write_instriction(0x08, 0x00);	// display start lower address
 		lcd_write_instriction(0x09, 0x00);	// display start upper address
@@ -102,7 +103,12 @@ void lcd_clear() {
 	}
 }
 
-//row - рядок, column -стовбчик,   
+void wr_display_data(uint8_t data) {
+	lcd_write_instriction(0x0C, data);	// writing display data
+}
+
+
+//row - , column |   
 void wr_letter(uint8_t row, uint8_t column, uint8_t letter ) {
 	uint16_t LCD_Address = row * 32 + column;
 	lcd_write_instriction(0x0A, LCD_Address & 0x00FF);	// cursor start lower address
@@ -120,15 +126,77 @@ void wr_text_in_character_mode(uint8_t row, uint8_t column, char* str) {
 }
 
 
+void wr_GRAPHIC (uint8_t* img) {
+
+	lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
+	lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
+
+	uint16_t addr = 0;
+	uint8_t dat = 0;
+
+	for (uint16_t i = 0; i < 2048; i++)
+	{
+		if (!(i % 16) && i > 15)
+		{
+			addr += 32;
+			lcd_write_instriction(0x0A, addr & 0x00FF);	// cursor start lower address
+			lcd_write_instriction(0x0B, addr >> 8);	    // cursor start upper address
+
+		}
+
+		dat = 0;
+		//------- revers byte -----------
+		dat |= (img[i] & 0x80) >> 7;
+		dat |= (img[i] & 0x40) >> 5;
+		dat |= (img[i] & 0x20) >> 3;
+		dat |= (img[i] & 0x10) >> 1;
+		dat |= (img[i] & 0x08) << 1;
+		dat |= (img[i] & 0x04) << 3;
+		dat |= (img[i] & 0x02) << 5;
+		dat |= (img[i] & 0x01) << 7;
+
+		wr_display_data(dat);
+	}
+}
+
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////// TEST FOO //////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <stdio.h>
+void wr_film_test(void) {
+	uint16_t time = 150;
 
-void wr_letters(void) {
+	while (1) {
+		wr_GRAPHIC(image_data_1);
+		delay(time);
+		wr_GRAPHIC(image_data_2);
+		delay(time);
+		wr_GRAPHIC(image_data_3);
+		delay(time);
+		wr_GRAPHIC(image_data_4);
+		delay(time);
+		wr_GRAPHIC(image_data_5);
+		delay(time);
+		wr_GRAPHIC(image_data_6);
+		delay(time);
+		wr_GRAPHIC(image_data_7);
+		delay(time);
+		wr_GRAPHIC(image_data_8);
+		delay(time);
+		wr_GRAPHIC(image_data_9);
+		delay(time);
+		wr_GRAPHIC(image_data_10);
+		delay(time);
+	}
+}
+
+
+
+void wr_letter_test(void) {
 	uint8_t n = 0;
 	for (uint8_t t = 0; t < 6; t++)
 	{
@@ -146,3 +214,5 @@ void wr_letters(void) {
 
 	wr_text_in_character_mode(12, 3, "Hello Oleg :)");
 }
+
+

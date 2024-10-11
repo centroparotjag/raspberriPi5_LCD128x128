@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gpio.h" />
+    <ClInclude Include="img_data.h" />
     <ClInclude Include="LC7981.h" />
   </ItemGroup>
   <ItemDefinitionGroup />

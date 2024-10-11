@@ -12,11 +12,13 @@ int main(void)
 	wiringPiSetupSys();
 	gpio_init();
 
-	init_LC7981(0);
+	init_LC7981(1);		// 0 - character / 1 - GRAPHIC mode
 
 	printf("END INIT LCD128x128\n");
 
-	wr_letters();
+	//wr_letters();
+
+	wr_film_test();
 
 	printf("END TEST\n");
 
