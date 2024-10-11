@@ -65,11 +65,13 @@
     </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DS18B20.cpp" />
     <ClCompile Include="gpio.cpp" />
     <ClCompile Include="LC7981.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DS18B20.h" />
     <ClInclude Include="gpio.h" />
     <ClInclude Include="img_data.h" />
     <ClInclude Include="LC7981.h" />

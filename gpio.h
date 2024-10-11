@@ -18,8 +18,12 @@
 	#define	CS	20
 	#define	RES	21
 	//-------------------
+	#define BUTTON 26 
+	#define DQ 4		// DS18B20
 
-int gpio_init(void);
+
+	void gpio_init(void);
+	int button_read(void);
 
 
 

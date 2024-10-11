@@ -2,10 +2,8 @@
 #include "gpio.h"
 #include <stdio.h>
 
-int gpio_init(void) {
-
-	//wiringPiSetupSys();
-
+void gpio_init(void) {
+	// display WG128128B (SANYO LC7981)
 	pinMode(DB0, OUTPUT);
 	pinMode(DB1, OUTPUT);
 	pinMode(DB2, OUTPUT);
@@ -18,6 +16,14 @@ int gpio_init(void) {
 	pinMode(E,   OUTPUT);
 	pinMode(CS,  OUTPUT);
 	pinMode(RES, OUTPUT);
+
+	// button
+	pinMode(BUTTON, INPUT);
+	pullUpDnControl(BUTTON, PUD_UP);
+
+	// DS18B20
+	pinMode(DQ, INPUT);
+	pullUpDnControl(DQ, PUD_UP);
 
 	// set default
 	digitalWrite(DB0, LOW);	  // Off
@@ -33,5 +39,38 @@ int gpio_init(void) {
 	digitalWrite(CS,  LOW);	  // Off
 	digitalWrite(RES, LOW);	  // Off
 
-	return 0;
+	delay(100);
+}
+
+
+int status_button = 0;
+
+int button_read(void) {
+	int i;
+	int filter = 0xff;
+
+	//--------------- 0 - BUTTON pressed --------------
+	i = 0;
+	while (i < filter && digitalRead(BUTTON) == 0) { i++; }
+	if (i == filter && status_button == 0) {
+		status_button = 1;
+		return 0;			// button = 0
+	}
+
+
+	//--------------- 1 - BUTTON unpressed --------------
+	i = 0;
+	while (i < filter && digitalRead(BUTTON) == 1) { i++; }
+	if (i == filter && status_button == 1) {
+		status_button = 0;
+		return 1;			// button = 0
+	}
+
+	//--------------- 
+	if (!digitalRead(BUTTON)) {
+		return 0xF0;		// released
+	}
+	else {
+		return 0x0F;		// pinched
+	}
 }

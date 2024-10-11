@@ -31,7 +31,6 @@ void lcd_write_instriction(uint8_t instruction, uint8_t data) {
 	delayMicroseconds(1);
 	wr_port_DB8b_LCD(instruction);
 	E_wr();
-
 	digitalWrite(RS, 0);
 	delayMicroseconds(1);
 	wr_port_DB8b_LCD(data);
@@ -44,13 +43,11 @@ uint8_t lcd_curline;	//!< Current line. Used for scrolling in text mode.
 
 void init_LC7981(uint8_t mode) {
 	lcd_mode = mode;
-
 	// reset LCD
 	digitalWrite(RES, LOW);  // Off
 	delay(1); // ms
 	digitalWrite(RES, HIGH);  // On
 	delay(1); // ms
-
 	if (mode == LCD_TEXT) {					// LCD_TEXT
 		lcd_write_instriction(0x00, 0x30);	// Mode control
 		lcd_write_instriction(0x01, 0x86);	// setting the character pitch 75
@@ -75,7 +72,6 @@ void init_LC7981(uint8_t mode) {
 	}
 	lcd_clear();
 }
-
 
 /**
  * Clears the display by setting the whole memory to 0.
@@ -107,7 +103,6 @@ void wr_display_data(uint8_t data) {
 	lcd_write_instriction(0x0C, data);	// writing display data
 }
 
-
 //row - , column |   
 void wr_letter(uint8_t row, uint8_t column, uint8_t letter ) {
 	uint16_t LCD_Address = row * 32 + column;
@@ -118,22 +113,17 @@ void wr_letter(uint8_t row, uint8_t column, uint8_t letter ) {
 
 void wr_text_in_character_mode(uint8_t row, uint8_t column, char* str) {
 	uint8_t i = 0;
-
 	while (str[i] != 0 && i < 18) {
 		wr_letter(row, column+i, str[i]);
 		i++;
 	}
 }
 
-
 void wr_GRAPHIC (uint8_t* img) {
-
-	lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
-	lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
-
 	uint16_t addr = 0;
 	uint8_t dat = 0;
-
+	lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
+	lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
 	for (uint16_t i = 0; i < 2048; i++)
 	{
 		if (!(i % 16) && i > 15)
@@ -143,7 +133,6 @@ void wr_GRAPHIC (uint8_t* img) {
 			lcd_write_instriction(0x0B, addr >> 8);	    // cursor start upper address
 
 		}
-
 		dat = 0;
 		//------- revers byte -----------
 		dat |= (img[i] & 0x80) >> 7;
@@ -154,7 +143,6 @@ void wr_GRAPHIC (uint8_t* img) {
 		dat |= (img[i] & 0x04) << 3;
 		dat |= (img[i] & 0x02) << 5;
 		dat |= (img[i] & 0x01) << 7;
-
 		wr_display_data(dat);
 	}
 }
@@ -170,30 +158,27 @@ void wr_GRAPHIC (uint8_t* img) {
 void wr_film_test(void) {
 	uint16_t time = 150;
 
-	while (1) {
-		wr_GRAPHIC(image_data_1);
-		delay(time);
-		wr_GRAPHIC(image_data_2);
-		delay(time);
-		wr_GRAPHIC(image_data_3);
-		delay(time);
-		wr_GRAPHIC(image_data_4);
-		delay(time);
-		wr_GRAPHIC(image_data_5);
-		delay(time);
-		wr_GRAPHIC(image_data_6);
-		delay(time);
-		wr_GRAPHIC(image_data_7);
-		delay(time);
-		wr_GRAPHIC(image_data_8);
-		delay(time);
-		wr_GRAPHIC(image_data_9);
-		delay(time);
-		wr_GRAPHIC(image_data_10);
-		delay(time);
-	}
-}
 
+	wr_GRAPHIC(image_data_1);
+
+	//lcd_write_instriction(0x00, 0x30);	// Mode control
+	//lcd_write_instriction(0x01, 0x86);	// setting the character pitch 75
+	//lcd_write_instriction(0x02, LCD_TEXT_COLUMNS - 1);	// number of character
+	//lcd_write_instriction(0x03, 0x7F);	// time devision number 0x4F
+	//lcd_write_instriction(0x04, 0x00);	// cursor position
+	//lcd_write_instriction(0x08, 0x00);	// display start lower address
+	//lcd_write_instriction(0x09, 0x00);	// display start upper address
+	//lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
+	//lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
+
+
+	//wr_text_in_character_mode(7, 3, "Test");
+	//wr_text_in_character_mode(8, 3, "compile time");
+	//wr_text_in_character_mode(9, 3, __DATE__);
+	//wr_text_in_character_mode(10, 3, __TIME__);
+	//wr_text_in_character_mode(12, 3, "Hello Oleg :)");
+
+}
 
 
 void wr_letter_test(void) {
@@ -206,12 +191,10 @@ void wr_letter_test(void) {
 			n++;
 		}
 	}
-
 	wr_text_in_character_mode(7, 3, "Test");
 	wr_text_in_character_mode(8, 3, "compile time");
 	wr_text_in_character_mode(9, 3, __DATE__);
 	wr_text_in_character_mode(10,3, __TIME__);
-
 	wr_text_in_character_mode(12, 3, "Hello Oleg :)");
 }
 

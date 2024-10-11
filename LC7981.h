@@ -26,5 +26,4 @@ void wr_GRAPHIC(uint8_t* img);
 void wr_letter_test(void);
 void wr_film_test(void);
 
-
 #endif // !LC7981_H_#pragma once
