@@ -22,10 +22,9 @@ void* worker(void* data)
 		usleep(751000);	// 751mS
 		print_t_DS18B20_in_terminal(flag_button);
 		i++;
-		sleep(10);
+		sleep(10);		// 10s period measurement T
 	}
 
-	printf("Thread worker done!\n");
 	return NULL;
 }
 
@@ -46,10 +45,8 @@ int main(void)
 	
 	while (1)
 	{
-		
 		if (button_read() == 0) {
 			printf("main button press. flag_button = %d\n", flag_button);
-
 			if (flag_button) {
 				init_LC7981(1);		// 0 - character / 1 - GRAPHIC mode
 				wr_film_test();
@@ -59,34 +56,9 @@ int main(void)
 				flag_button = 1;
 				print_t_DS18B20_in_terminal(flag_button);
 			}
-
 		}
-		usleep(50000);
+		usleep(50000);	// 50ms
 	}
 
 	return 0;
 }
-
-
-//int main(void)
-//{
-//	//printf("Raspberry Pi 5 LCD128x128 test 1\n");
-//	//wiringPiSetupSys();
-//	//gpio_init();
-//	//init_LC7981(1);		// 0 - character / 1 - GRAPHIC mode
-//	//printf("END INIT LCD128x128\n");
-//	////wr_letters();
-//	//wr_film_test();
-//	////printf("END TEST\n");
-//
-//
-//
-//
-//
-//	//while (true)
-//	//{
-//	//	//read_t_DS18B20_test();
-//	//	//delay(1500);
-//	//}
-//	return 0;
-//}
