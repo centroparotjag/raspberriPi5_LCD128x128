@@ -67,10 +67,11 @@ int button_read(void) {
 	}
 
 	//--------------- 
-	if (!digitalRead(BUTTON)) {
+	if (digitalRead(BUTTON) == 0) {
 		return 0xF0;		// released
 	}
 	else {
 		return 0x0F;		// pinched
 	}
+
 }

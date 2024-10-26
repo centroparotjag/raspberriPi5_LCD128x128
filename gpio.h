@@ -18,7 +18,7 @@
 	#define	CS	20
 	#define	RES	21
 	//-------------------
-	#define BUTTON 26 
+	#define BUTTON 26		// 26 
 	#define DQ 4		// DS18B20
 
 

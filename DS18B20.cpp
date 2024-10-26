@@ -323,7 +323,43 @@ unsigned int READ_TEMPERATURE(void) {
 
 
 //========================================================================
+void print_t_DS18B20_in_terminal(int mode_lcd) {
+	unsigned int T_src = READ_TEMPERATURE();
+	char s = 0;
+	float Td;
 
+	char sign = T_src >> 15;
+	unsigned long long T = T_src & 0x07FF;
+
+	if (sign) {
+		T = (0x0800 - T);
+		s = '-';
+	}
+	else {
+		wr_text_in_character_mode(0, 0, "+");
+		s = '+';
+	}
+
+	Td = T;
+	Td *= 0.0625;
+
+	printf("Thread \"Worker\": t = %c%.4f\n", s, Td);
+
+	char ptr[200] = {0};
+
+	 sprintf (ptr, "t = %c%.4f\n", s, Td);
+
+	 if (!mode_lcd) {
+
+	 }
+	 else {
+		 init_LC7981(0);		// 0 - character / 1 - GRAPHIC mode
+		 wr_text_in_character_mode(0, 3, ptr);
+	 }
+
+
+
+}
 
 void read_t_DS18B20_test(void) {
 	uint16_t S2, S1, S0;

@@ -42,5 +42,5 @@ unsigned int read_t_after_convert_DS12B20(void);
 unsigned char start_t_convert_DS12B20(void);
 void time_out_convert_t(unsigned char  timer, unsigned char  conversial_period);
 void read_t_DS18B20_test(void);
-
+void print_t_DS18B20_in_terminal(int mode_lcd);
 #endif /* DS18B20_H_ */

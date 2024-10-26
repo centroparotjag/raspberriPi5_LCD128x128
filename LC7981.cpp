@@ -158,25 +158,7 @@ void wr_GRAPHIC (uint8_t* img) {
 void wr_film_test(void) {
 	uint16_t time = 150;
 
-
 	wr_GRAPHIC(image_data_1);
-
-	//lcd_write_instriction(0x00, 0x30);	// Mode control
-	//lcd_write_instriction(0x01, 0x86);	// setting the character pitch 75
-	//lcd_write_instriction(0x02, LCD_TEXT_COLUMNS - 1);	// number of character
-	//lcd_write_instriction(0x03, 0x7F);	// time devision number 0x4F
-	//lcd_write_instriction(0x04, 0x00);	// cursor position
-	//lcd_write_instriction(0x08, 0x00);	// display start lower address
-	//lcd_write_instriction(0x09, 0x00);	// display start upper address
-	//lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
-	//lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
-
-
-	//wr_text_in_character_mode(7, 3, "Test");
-	//wr_text_in_character_mode(8, 3, "compile time");
-	//wr_text_in_character_mode(9, 3, __DATE__);
-	//wr_text_in_character_mode(10, 3, __TIME__);
-	//wr_text_in_character_mode(12, 3, "Hello Oleg :)");
 
 }
 
