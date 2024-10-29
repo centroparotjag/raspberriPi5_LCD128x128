@@ -1,6 +1,7 @@
 #include <wiringPi.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include "LC7981.h"
 #include "gpio.h"
 #include <string.h>
@@ -147,18 +148,166 @@ void wr_GRAPHIC (uint8_t* img) {
 	}
 }
 
+//---------------------------------------------------------------------------------------
+uint8_t LCD_BUF[2048] = { 0 };
+
+void wr_in_display_lcd_buff(void) {
+	uint16_t addr = 0;
+	lcd_write_instriction(0x0A, 0x00);	// cursor start lower address
+	lcd_write_instriction(0x0B, 0x00);	// cursor start upper address
+	for (uint16_t i = 0; i < 2048; i++)
+	{
+		if (!(i % 16) && i > 15)
+		{
+			addr += 32;
+			lcd_write_instriction(0x0A, addr & 0x00FF);	// cursor start lower address
+			lcd_write_instriction(0x0B, addr >> 8);	    // cursor start upper address
+		}
+		wr_display_data(LCD_BUF[i]);
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////// TEST FOO //////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
+	}
+}
+
+void copy_buf(int revers_byte, int inverting_data, uint8_t* buf) {
+	for (int i = 0; i < 2048; i++)
+	{
+		uint8_t data = 0;
+
+		if (inverting_data==true)
+		{
+			data = ~buf[i];		// inversion
+		}
+		else {
+
+			data = buf[i];		// inversion
+		}
+
+		if (revers_byte == true)
+		{
+			uint8_t dat = 0;
+			//------- revers byte -----------
+			dat |= (data & 0x80) >> 7;
+			dat |= (data & 0x40) >> 5;
+			dat |= (data & 0x20) >> 3;
+			dat |= (data & 0x10) >> 1;
+			dat |= (data & 0x08) << 1;
+			dat |= (data & 0x04) << 3;
+			dat |= (data & 0x02) << 5;
+			dat |= (data & 0x01) << 7;
+			LCD_BUF[i] = dat;
+		}
+		else {
+			LCD_BUF[i] = data;
+		}
+	}
+}
+
+
+
+//---------------------------------------------------------------------------------------
+//  column (128) |    row (128) -         
+void wr_data_to_buf_lcd_at_addrr (int ROW, int COLUMN, uint8_t byte) {
+	uint16_t addr_arr, num_b, num_B = 0;
+
+	num_B = COLUMN / 8;					// 9/8=1
+	num_b = COLUMN - num_B * 8;			// 9-8=1
+
+	addr_arr = num_B + ROW * 16;
+
+	switch (num_b)
+	{
+		case 0:
+			LCD_BUF[addr_arr] = byte;
+			break;
+		case 1:
+			LCD_BUF[addr_arr + 1] &= 0b11111110;					// clear
+			LCD_BUF[addr_arr + 1] |= ((byte >> 7));	// set
+			LCD_BUF[addr_arr + 0] &= 0b00000001;
+			LCD_BUF[addr_arr + 0] |= ((byte << 1) );	// set
+			break;
+		case 2:
+			LCD_BUF[addr_arr + 1] &= 0b11111100;					// clear
+			LCD_BUF[addr_arr + 1] |= ((byte >> 6) );	// set
+			LCD_BUF[addr_arr + 0] &= 0b00000011;
+			LCD_BUF[addr_arr + 0] |= ((byte << 2));	// set
+			break;
+		case 3:
+			LCD_BUF[addr_arr + 1] &= 0b11111000;					// clear
+			LCD_BUF[addr_arr + 1] |= ((byte >> 5) );	// set
+			LCD_BUF[addr_arr + 0] &= 0b00000111;
+			LCD_BUF[addr_arr + 0] |= ((byte << 3) );	// set
+			break;
+		case 4:
+			LCD_BUF[addr_arr + 1] &= 0b11110000;					// clear
+			LCD_BUF[addr_arr + 1] |= ((byte >> 4) );	// set
+			LCD_BUF[addr_arr + 0] &= 0b00001111;
+			LCD_BUF[addr_arr + 0] |= ((byte << 4) );	// set
+			break;
+		case 5:
+			LCD_BUF[addr_arr + 1] &= 0b11100000;					// clear
+			LCD_BUF[addr_arr + 1] |= ((byte >> 3) );	// set
+			LCD_BUF[addr_arr + 0] &= 0b00011111;
+			LCD_BUF[addr_arr + 0] |= ((byte << 5) );	// set
+			break;
+		case 6:
+			LCD_BUF[addr_arr + 1] &= 0b11000000;					// clear
+			LCD_BUF[addr_arr + 1] |= ((byte >> 2) );	// set
+			LCD_BUF[addr_arr + 0] &= 0b00111111;
+			LCD_BUF[addr_arr + 0] |= ((byte << 6) );	// set
+			break;
+		case 7:
+			LCD_BUF[addr_arr + 1] &= 0b10000000;					// clear
+			LCD_BUF[addr_arr + 1] |= ((byte >> 1) );	// set
+			LCD_BUF[addr_arr + 0] &= 0b01111111;
+			LCD_BUF[addr_arr + 0] |= ((byte << 7));	// set
+			break;
+		default:
+			break;
+	}
+}
+
+void wr_letter_font10x16_gr_m(int ROW, int COLUMN, int letter) {
+	uint8_t row_i = ROW;
+	uint16_t data, i;
+	data = (letter - 32) * 32;		// ASCII - 32 (array font shift)
+	i = 0;
+	while ( i < 32 && COLUMN < 119)
+	{
+
+		wr_data_to_buf_lcd_at_addrr(row_i, COLUMN, font_terminal_15[data + i]);
+		i++;
+		wr_data_to_buf_lcd_at_addrr(row_i, COLUMN + 8, font_terminal_15[data + i]);
+		i++;
+
+		row_i++;
+	}
+}
+
+void wr_text_font10x16_grafic_mode(int ROW, int COLUMN, char* str) {
+	uint8_t i = 0;
+
+	i = 0;
+	while (str[i] != 0 && i < 13) {		//  num letter max=13
+		wr_letter_font10x16_gr_m(ROW, COLUMN + i * 10, str[i]);
+		i++;
+	}
+	wr_in_display_lcd_buff();
+}
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////// TEST FOO ///////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 
 void wr_film_test(void) {
 	uint16_t time = 150;
 
-	wr_GRAPHIC(image_data_1);
+	wr_GRAPHIC(image_menu1);			// image_data_1
 
 }
 

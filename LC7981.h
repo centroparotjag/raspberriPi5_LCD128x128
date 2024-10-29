@@ -19,8 +19,11 @@ void lcd_clear();
 void wr_letter(uint8_t row, uint8_t column, uint8_t letter);
 void wr_text_in_character_mode(uint8_t row, uint8_t column, char* str);
 void wr_GRAPHIC(uint8_t* img);
-
-
+void wr_text_font10x16_grafic_mode(int ROW, int COLUMN, char* str);
+void wr_in_display_lcd_buff(void);
+void copy_buf(int revers_byte, int inverting_data, uint8_t* buf);
+void wr_data_to_buf_lcd_at_addrr(int ROW, int COLUMN, uint8_t byte);
+void wr_letter_font10x16_gr_m(int ROW, int COLUMN, int letter);
 
 //    test foo
 void wr_letter_test(void);
